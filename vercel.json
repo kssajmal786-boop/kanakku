@@ -2,7 +2,13 @@
   "version": 2,
   "buildCommand": "npm run build",
   "functions": {
-    "api/index.js": {
+    "api/*.js": {
+      "includeFiles": "backend/dist/**",
+      "maxDuration": 60,
+      "memory": 1024
+    },
+    "index.js": {
+      "includeFiles": "backend/dist/**",
       "maxDuration": 60,
       "memory": 1024
     }
@@ -35,10 +41,6 @@
     {
       "source": "/health",
       "destination": "/api/index"
-    },
-    {
-      "source": "/api/test",
-      "destination": "/api/test"
     },
     {
       "source": "/api/:path*",
