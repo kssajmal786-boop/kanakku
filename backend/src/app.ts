@@ -13,6 +13,7 @@ import cookieParser from 'cookie-parser';
 import morgan from 'morgan';
 import crypto from 'crypto';
 import path from 'path';
+import fs from 'fs';
 
 import { config } from './config';
 import { logger } from './utils/logger';
@@ -108,14 +109,25 @@ export function createApp(): Application {
   app.use('/api', apiRouter);
 
   // ── Serve frontend static files ────────────────────────────────────────
-  // In standalone production (e.g. Render/Docker), backend serves the PWA.
-  // On Vercel, static files are served automatically at the edge from /public.
-  if (config.server.isProduction && !process.env.VERCEL) {
-    const frontendPath = path.resolve(__dirname, '../../frontend');
-    app.use(express.static(frontendPath));
+  // In production (Render, Docker, or Vercel), backend serves static PWA as fallback
+  const publicPath = path.resolve(process.cwd(), 'public');
+  const frontendPath = path.resolve(__dirname, '../../frontend');
+  const staticPath = fs.existsSync(publicPath) ? publicPath : (fs.existsSync(frontendPath) ? frontendPath : null);
+
+  if (staticPath) {
+    app.use(express.static(staticPath));
     // SPA fallback
-    app.get('*', (_req, res) => {
-      res.sendFile(path.join(frontendPath, 'index.html'));
+    app.get('*', (_req, res, next) => {
+      // If request looks like an API call that was unhandled, pass to 404 handler
+      if (_req.path.startsWith('/api') || _req.path.startsWith('/auth') || _req.path.startsWith('/gmail') || _req.path.startsWith('/ai')) {
+        return next();
+      }
+      const indexPath = path.join(staticPath, 'index.html');
+      if (fs.existsSync(indexPath)) {
+        res.sendFile(indexPath);
+      } else {
+        res.status(200).send('CashFlow API is live');
+      }
     });
   }
 

@@ -15,6 +15,7 @@
 import { Pool, PoolConfig, QueryResultRow } from 'pg';
 import fs from 'fs';
 import path from 'path';
+import os from 'os';
 import { logger } from '../utils/logger';
 import { config } from '../config';
 
@@ -105,7 +106,8 @@ class LocalRelationalEngine {
   private writeLock: Promise<void> = Promise.resolve();
 
   constructor() {
-    this.dataDir = path.resolve(process.cwd(), 'data');
+    const isServerless = !!process.env.VERCEL || !!process.env.AWS_LAMBDA_FUNCTION_NAME || !!process.env.LAMBDA_TASK_ROOT;
+    this.dataDir = isServerless ? path.resolve(os.tmpdir(), 'kanakku_data') : path.resolve(process.cwd(), 'data');
     const filename = process.env.NODE_ENV === 'test' ? 'kanakku_accounts.test.json' : 'kanakku_accounts.json';
     this.dbPath = path.resolve(this.dataDir, filename);
   }
@@ -113,8 +115,12 @@ class LocalRelationalEngine {
   public async init(): Promise<void> {
     if (this.initialized) return;
 
-    if (!fs.existsSync(this.dataDir)) {
-      fs.mkdirSync(this.dataDir, { recursive: true });
+    try {
+      if (!fs.existsSync(this.dataDir)) {
+        fs.mkdirSync(this.dataDir, { recursive: true });
+      }
+    } catch (err) {
+      logger.warn('Could not create local data directory', { error: (err as Error).message });
     }
 
     if (fs.existsSync(this.dbPath)) {
@@ -195,16 +201,20 @@ class LocalRelationalEngine {
 
   private async persist(): Promise<void> {
     this.writeLock = this.writeLock.then(() => {
-      const data = {
-        _schema: 'kanakku_accounts_v1',
-        _comment: 'Server database strictly stores only account credentials and preferences - NO financial data.',
-        migrations: Array.from(this.migrations),
-        users: Array.from(this.users.values()),
-        gmailConnections: Array.from(this.gmailConnections.values()),
-        processedMessages: Array.from(this.processedMessages.values()),
-        gmailSyncStates: Array.from(this.gmailSyncStates.values()),
-      };
-      fs.writeFileSync(this.dbPath, JSON.stringify(data, null, 2), 'utf-8');
+      try {
+        const data = {
+          _schema: 'kanakku_accounts_v1',
+          _comment: 'Server database strictly stores only account credentials and preferences - NO financial data.',
+          migrations: Array.from(this.migrations),
+          users: Array.from(this.users.values()),
+          gmailConnections: Array.from(this.gmailConnections.values()),
+          processedMessages: Array.from(this.processedMessages.values()),
+          gmailSyncStates: Array.from(this.gmailSyncStates.values()),
+        };
+        fs.writeFileSync(this.dbPath, JSON.stringify(data, null, 2), 'utf-8');
+      } catch (err) {
+        logger.warn('Could not persist local relational database to disk', { error: (err as Error).message });
+      }
     });
     return this.writeLock;
   }
