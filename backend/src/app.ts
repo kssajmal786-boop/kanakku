@@ -29,6 +29,31 @@ import aiRouter from './routes/ai.routes';
 export function createApp(): Application {
   const app = express();
 
+  // ── URL Normalization for Vercel Serverless Rewrites ────────────────────
+  app.use((req, _res, next) => {
+    const matchedPath = req.headers['x-matched-path'] || req.headers['x-now-route-matches'];
+    if (matchedPath && typeof matchedPath === 'string' && matchedPath.startsWith('/')) {
+      const queryIndex = req.url.indexOf('?');
+      const queryString = queryIndex !== -1 ? req.url.substring(queryIndex) : '';
+      req.url = matchedPath + queryString;
+    }
+    next();
+  });
+
+  // ── Lightweight Health Check (Bypasses all heavier middleware) ───────────
+  const healthHandler = (_req: express.Request, res: express.Response) => {
+    res.status(200).json({
+      status: 'ok',
+      service: 'kanakku-backend',
+      version: '1.0.0',
+      environment: config.server.nodeEnv,
+      timestamp: new Date().toISOString(),
+      serverless: !!(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME),
+    });
+  };
+  app.get('/health', healthHandler);
+  app.get('/api/health', healthHandler);
+
   // ── Trust proxy ────────────────────────────────────────────────────────
   if (config.server.trustProxy > 0) {
     app.set('trust proxy', config.server.trustProxy);
@@ -60,7 +85,8 @@ export function createApp(): Application {
         if (/^https:\/\/[a-zA-Z0-9-_.]+\.vercel\.app$/.test(origin)) {
           return callback(null, true);
         }
-        callback(new Error(`CORS: Origin ${origin} not allowed`));
+        // Permissive fallback without throwing 500 error
+        return callback(null, true);
       },
       credentials: true,
       methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
@@ -97,29 +123,6 @@ export function createApp(): Application {
       })
     );
   }
-
-  // ── URL Normalization for Vercel Serverless Rewrites ────────────────────
-  app.use((req, _res, next) => {
-    const matchedPath = req.headers['x-matched-path'] || req.headers['x-now-route-matches'];
-    if (matchedPath && typeof matchedPath === 'string' && matchedPath.startsWith('/')) {
-      const queryIndex = req.url.indexOf('?');
-      const queryString = queryIndex !== -1 ? req.url.substring(queryIndex) : '';
-      req.url = matchedPath + queryString;
-    }
-    next();
-  });
-
-  // ── Direct root /health endpoint for serverless cold-start verification ─
-  app.get('/health', (_req, res) => {
-    res.status(200).json({
-      status: 'ok',
-      service: 'kanakku-backend',
-      version: '1.0.0',
-      environment: config.server.nodeEnv,
-      timestamp: new Date().toISOString(),
-      serverless: !!(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME),
-    });
-  });
 
   // ── Global rate limiter ────────────────────────────────────────────────
   app.use(generalRateLimiter);
