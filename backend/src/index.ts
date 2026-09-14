@@ -27,7 +27,7 @@ db.init().catch(err => {
   logger.error('Failed to initialize database on startup', { error: err.message });
 });
 
-const server = app.listen(config.server.port, () => {
+const server = app.listen(config.server.port, '0.0.0.0', () => {
   logger.info(`Cashflow backend running`, {
     port: config.server.port,
     env: config.server.nodeEnv,
