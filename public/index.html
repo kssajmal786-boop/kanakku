@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="description" content="CashFlow – Track UPI, cards, cash, and more. AI-powered personal finance for modern India." />
+  <meta name="theme-color" content="#f5f6f8" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="CashFlow" />
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="CashFlow – Personal Finance" />
+  <meta property="og:description" content="Track UPI, cards, cash, and more. AI-powered insights." />
+  <meta property="og:type" content="website" />
+
+  <title>CashFlow – Personal Finance</title>
+
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="/manifest.json" />
+
+  <!-- Instant Theme Boot (Prevents FOUC) -->
+  <script>
+    (function() {
+      try {
+        var user = JSON.parse(localStorage.getItem('cashflow_user') || 'null');
+        var userId = user && user.userId ? user.userId : null;
+        var saved = userId ? localStorage.getItem('cashflow_theme_' + userId) : localStorage.getItem('cashflow_theme');
+        var theme = (saved === 'dark' || saved === 'system') ? saved : 'light';
+        var effective = theme;
+        if (theme === 'system') {
+          effective = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+        document.documentElement.setAttribute('data-theme', effective);
+        document.documentElement.setAttribute('data-theme-preference', theme);
+        document.documentElement.style.colorScheme = effective;
+        var meta = document.querySelector('meta[name="theme-color"]');
+        if (meta) meta.setAttribute('content', effective === 'dark' ? '#0b0f19' : '#f5f6f8');
+      } catch (_) {}
+    })();
+  </script>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/design-system.css" />
+  <link rel="stylesheet" href="/css/animations.css" />
+  <link rel="stylesheet" href="/css/components.css" />
+  <link rel="stylesheet" href="/css/layouts.css" />
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+  <!-- Dexie.js (IndexedDB local-first database) -->
+  <script src="https://cdn.jsdelivr.net/npm/dexie@3.2.4/dist/dexie.min.js"></script>
+
+  <!-- jsPDF & AutoTable for deterministic local PDF generation -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+
+  <!-- Tesseract.js for client-side privacy-first receipt OCR -->
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+
+  <!-- Chart.js defaults -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      if (window.Chart) {
+        Chart.defaults.color = '#8b95a9';
+        Chart.defaults.borderColor = 'rgba(255,255,255,0.06)';
+        Chart.defaults.font.family = "'Inter', sans-serif";
+        Chart.defaults.font.size = 11;
+      }
+    });
+  </script>
+</head>
+<body>
+
+<div id="app">
+
+  <!-- ═══════════════════════════════════════
+       AUTH / ONBOARDING SHELL
+  ═══════════════════════════════════════ -->
+  <div id="auth-shell" style="display:none;"></div>
+
+  <!-- ═══════════════════════════════════════
+       MAIN APPLICATION SHELL
+  ═══════════════════════════════════════ -->
+  <div id="main-shell" style="display:none;">
+
+    <!-- Desktop Sidebar (hidden below 1024px, see layouts.css) -->
+    <aside class="desktop-nav" id="desktop-sidebar" aria-label="Main navigation"></aside>
+
+    <div class="shell-main">
+      <!-- App Header -->
+      <header class="app-header" id="app-header">
+        <div class="app-header-title">CashFlow</div>
+        <div class="app-header-right">
+          <span class="sync-pill offline" id="header-sync-pill">
+            <span class="sync-pill-dot"></span>
+            <span id="header-sync-label">Checking sync…</span>
+          </span>
+          <!-- Avatar -->
+          <div class="avatar avatar-sm" id="header-avatar" style="cursor:pointer;">?</div>
+        </div>
+      </header>
+
+      <!-- Pages Container -->
+      <main id="pages-container" style="flex:1;position:relative;">
+        <!-- Pages are dynamically injected here by app.js -->
+      </main>
+
+      <!-- Bottom Navigation (mobile only, see layouts.css) -->
+      <nav class="bottom-nav" id="bottom-nav" aria-label="Main navigation">
+        <!-- Nav items injected by app.js -->
+      </nav>
+    </div>
+
+  </div>
+
+  <!-- Toast Container (global) -->
+  <div id="toast-container" class="toast-container" aria-live="polite"></div>
+
+</div>
+
+<!-- App Entry Point -->
+<script type="module" src="/js/app.js"></script>
+
+<!-- Inline fallback styles for non-JS -->
+<noscript>
+  <style>
+    body::after {
+      content: 'Please enable JavaScript to use CashFlow.';
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100dvh;
+      font-family: sans-serif;
+      color: #f0f4ff;
+    }
+  </style>
+</noscript>
+
+</body>
+</html>

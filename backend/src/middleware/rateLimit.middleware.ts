@@ -17,7 +17,7 @@ export const generalRateLimiter = rateLimit({
     code: 'RATE_LIMITED',
     timestamp: new Date().toISOString(),
   },
-  skip: () => config.server.isTest,
+  skip: (req) => config.server.isTest || req.path === '/health' || req.path === '/api/health',
 });
 
 /** Gmail sync rate limiter — stricter to prevent Gmail API abuse */

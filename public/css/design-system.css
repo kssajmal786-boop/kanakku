@@ -1,0 +1,288 @@
+/* ============================================================
+   CashFlow Design System
+   CSS Custom Properties, Base Styles, Typography
+   ============================================================ */
+
+/* ---------- Google Fonts ---------- */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Sans+Tamil:wght@300;400;500;600;700&display=swap');
+
+/* ---------- CSS Reset ---------- */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* ---------- Design Tokens ---------- */
+:root {
+  /* ============================================================
+     COMMAND CONSOLE THEME
+     A clean, light instrument panel for personal cash flow.
+     Three purposeful accents, each with one job only:
+       --color-flow   : money in motion (income, positive trend, radar line)
+       --color-intel  : reserved for the AI Financial Intelligence panel
+       --color-expense: money going out / critical alerts
+     Numbers use a monospace face throughout (see --font-mono usage)
+     so amounts and scores align like a ledger, not a poster.
+     ============================================================ */
+
+  color-scheme: light;
+
+  /* Color Palette */
+  --color-bg-primary:      #f5f6f8;
+  --color-bg-secondary:    #ffffff;
+  --color-bg-card:         #ffffff;
+  --color-bg-card-hover:   #f0f2f5;
+  --color-bg-elevated:     #ffffff;
+  --color-bg-input:        #f0f2f5;
+  --color-bg-overlay:      rgba(16, 21, 31, 0.5);
+  --color-surface-alt:     #f8f9fa;
+  --color-header-bg:       rgba(255, 255, 255, 0.85);
+  --color-nav-bg:          rgba(255, 255, 255, 0.95);
+
+  /* Brand / semantic accents */
+  --color-brand-primary:   #0e7c7b;   /* teal — "flow" */
+  --color-brand-secondary: #4338ca;   /* indigo — "intelligence" */
+  --color-brand-accent:    #d97706;   /* amber — attention */
+  --color-flow:             #0e7c7b;
+  --color-intel:            #4338ca;
+  --gradient-brand:        linear-gradient(135deg, #0e7c7b 0%, #0a5f5e 100%);
+  --gradient-income:       linear-gradient(135deg, #0e7c7b 0%, #14b8a6 100%);
+  --gradient-expense:      linear-gradient(135deg, #dc2626 0%, #f87171 100%);
+  --gradient-card:         linear-gradient(145deg, #ffffff 0%, #fbfcfd 100%);
+  --gradient-glass:        linear-gradient(145deg, rgba(16,21,31,0.03), rgba(16,21,31,0.01));
+
+  /* Text Colors */
+  --color-text-primary:    #10151f;
+  --color-text-secondary:  #667085;
+  --color-text-muted:      #98a2b3;
+  --color-text-inverse:    #ffffff;
+  --color-text-brand:      #0e7c7b;
+  --color-text-income:     #0e7c7b;
+  --color-text-expense:    #dc2626;
+
+  /* Border */
+  --color-border:          rgba(16, 21, 31, 0.09);
+  --color-border-focus:    rgba(14, 124, 123, 0.5);
+  --color-border-subtle:   rgba(16, 21, 31, 0.05);
+
+  /* Status Colors */
+  --color-success:         #0e7c7b;
+  --color-warning:         #d97706;
+  --color-danger:          #dc2626;
+  --color-info:            #2563eb;
+
+  /* Shadows — subtle, since the surface is already light */
+  --shadow-sm:   0 1px 2px rgba(16,21,31,0.05);
+  --shadow-md:   0 4px 16px rgba(16,21,31,0.06);
+  --shadow-lg:   0 8px 32px rgba(16,21,31,0.08);
+  --shadow-xl:   0 16px 48px rgba(16,21,31,0.10);
+  --shadow-brand: 0 4px 20px rgba(14, 124, 123, 0.18);
+  --shadow-glow:  0 0 32px rgba(14, 124, 123, 0.10);
+
+  /* Typography */
+  --font-primary:  'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-tamil:    'Noto Sans Tamil', 'Inter', sans-serif;
+  --font-mono:     'JetBrains Mono', 'Fira Code', monospace;
+
+  /* Font Sizes (Fluid) */
+  --text-xs:   0.75rem;   /* 12px */
+  --text-sm:   0.875rem;  /* 14px */
+  --text-base: 1rem;      /* 16px */
+  --text-md:   1.125rem;  /* 18px */
+  --text-lg:   1.25rem;   /* 20px */
+  --text-xl:   1.5rem;    /* 24px */
+  --text-2xl:  1.875rem;  /* 30px */
+  --text-3xl:  2.25rem;   /* 36px */
+  --text-4xl:  3rem;      /* 48px */
+
+  /* Font Weights */
+  --weight-light:    300;
+  --weight-regular:  400;
+  --weight-medium:   500;
+  --weight-semibold: 600;
+  --weight-bold:     700;
+  --weight-extrabold:800;
+
+  /* Spacing (8px base grid) */
+  --space-1:  0.25rem;  /* 4px */
+  --space-2:  0.5rem;   /* 8px */
+  --space-3:  0.75rem;  /* 12px */
+  --space-4:  1rem;     /* 16px */
+  --space-5:  1.25rem;  /* 20px */
+  --space-6:  1.5rem;   /* 24px */
+  --space-8:  2rem;     /* 32px */
+  --space-10: 2.5rem;   /* 40px */
+  --space-12: 3rem;     /* 48px */
+  --space-16: 4rem;     /* 64px */
+  --space-20: 5rem;     /* 80px */
+
+  /* Border Radius */
+  --radius-sm:   6px;
+  --radius-md:   12px;
+  --radius-lg:   16px;
+  --radius-xl:   20px;
+  --radius-2xl:  24px;
+  --radius-full: 9999px;
+
+  /* Transitions */
+  --transition-fast:   150ms ease;
+  --transition-base:   250ms ease;
+  --transition-slow:   400ms ease;
+  --transition-spring: 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* Z-index */
+  --z-base:    1;
+  --z-sticky:  100;
+  --z-nav:     200;
+  --z-overlay: 300;
+  --z-modal:   400;
+  --z-toast:   500;
+
+  /* Safe Area */
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-top:    env(safe-area-inset-top, 0px);
+}
+
+/* ---------- Dark Theme Overrides ---------- */
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  /* Color Palette — Command Console Dark */
+  --color-bg-primary:      #0b0f19;
+  --color-bg-secondary:    #111827;
+  --color-bg-card:         #151d2e;
+  --color-bg-card-hover:   #1c263c;
+  --color-bg-elevated:     #1a2337;
+  --color-bg-input:        #131a29;
+  --color-bg-overlay:      rgba(3, 7, 18, 0.75);
+  --color-surface-alt:     #162032;
+  --color-header-bg:       rgba(17, 24, 39, 0.88);
+  --color-nav-bg:          rgba(17, 24, 39, 0.95);
+
+  /* Brand / semantic accents */
+  --color-brand-primary:   #14b8a6;   /* brighter teal for dark mode */
+  --color-brand-secondary: #818cf8;   /* lighter indigo/intelligence */
+  --color-brand-accent:    #f59e0b;   /* vivid amber */
+  --color-flow:            #14b8a6;
+  --color-intel:           #818cf8;
+  --gradient-brand:        linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+  --gradient-income:       linear-gradient(135deg, #10b981 0%, #14b8a6 100%);
+  --gradient-expense:      linear-gradient(135deg, #ef4444 0%, #f87171 100%);
+  --gradient-card:         linear-gradient(145deg, #151d2e 0%, #111827 100%);
+  --gradient-glass:        linear-gradient(145deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.01));
+
+  /* Text Colors */
+  --color-text-primary:    #f3f4f6;
+  --color-text-secondary:  #9ca3af;
+  --color-text-muted:      #6b7280;
+  --color-text-inverse:    #0b0f19;
+  --color-text-brand:      #14b8a6;
+  --color-text-income:     #34d399;
+  --color-text-expense:    #f87171;
+
+  /* Border */
+  --color-border:          rgba(255, 255, 255, 0.12);
+  --color-border-focus:    rgba(20, 184, 166, 0.6);
+  --color-border-subtle:   rgba(255, 255, 255, 0.06);
+
+  /* Status Colors */
+  --color-success:         #10b981;
+  --color-warning:         #f59e0b;
+  --color-danger:          #ef4444;
+  --color-info:            #3b82f6;
+
+  /* Shadows */
+  --shadow-sm:   0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md:   0 4px 16px rgba(0, 0, 0, 0.5);
+  --shadow-lg:   0 8px 32px rgba(0, 0, 0, 0.6);
+  --shadow-xl:   0 16px 48px rgba(0, 0, 0, 0.7);
+  --shadow-brand: 0 4px 20px rgba(20, 184, 166, 0.25);
+  --shadow-glow:  0 0 32px rgba(20, 184, 166, 0.15);
+}
+
+/* ---------- Base ---------- */
+html {
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+  scrollbar-gutter: stable;
+}
+
+body {
+  font-family: var(--font-primary);
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  min-height: 100dvh;
+  line-height: 1.6;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body.lang-ta {
+  font-family: var(--font-tamil);
+}
+
+/* ---------- Typography ---------- */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: var(--weight-semibold);
+  line-height: 1.3;
+  letter-spacing: -0.02em;
+}
+
+h1 { font-size: var(--text-2xl); }
+h2 { font-size: var(--text-xl); }
+h3 { font-size: var(--text-lg); }
+h4 { font-size: var(--text-md); }
+h5 { font-size: var(--text-base); }
+h6 { font-size: var(--text-sm); }
+
+p { line-height: 1.7; }
+
+a {
+  color: var(--color-brand-primary);
+  text-decoration: none;
+  transition: opacity var(--transition-fast);
+}
+
+a:hover { opacity: 0.8; }
+
+/* ---------- Currency ---------- */
+.currency {
+  font-family: var(--font-mono);
+  font-feature-settings: 'tnum';
+  font-variant-numeric: tabular-nums;
+}
+
+.amount-positive { color: var(--color-text-income); }
+.amount-negative { color: var(--color-text-expense); }
+
+/* ---------- Scrollbar ---------- */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--color-bg-elevated);
+  border-radius: var(--radius-full);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-brand-primary);
+}
+
+/* ---------- Selection ---------- */
+::selection {
+  background: rgba(14, 124, 123, 0.25);
+  color: var(--color-text-primary);
+}
+
+/* ---------- Focus Visible ---------- */
+:focus-visible {
+  outline: 2px solid var(--color-brand-primary);
+  outline-offset: 3px;
+  border-radius: var(--radius-sm);
+}
+
+/* ---------- Media Print ---------- */
+@media print {
+  body { background: white; color: black; }
+}

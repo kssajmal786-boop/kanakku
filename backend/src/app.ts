@@ -34,11 +34,15 @@ export function createApp(): Application {
     app.set('trust proxy', config.server.trustProxy);
   }
 
-  // ── Security headers ───────────────────────────────────────────────────
+  // ── Disable Express x-powered-by header natively ───────────────────────
+  app.disable('x-powered-by');
+
+  // ── Security headers (hidePoweredBy: false prevents removeHeader crash in serverless) ─
   app.use(
     helmet({
       contentSecurityPolicy: false, // Frontend sets its own CSP
       crossOriginEmbedderPolicy: false,
+      hidePoweredBy: false,
     })
   );
 
@@ -93,6 +97,29 @@ export function createApp(): Application {
       })
     );
   }
+
+  // ── URL Normalization for Vercel Serverless Rewrites ────────────────────
+  app.use((req, _res, next) => {
+    const matchedPath = req.headers['x-matched-path'] || req.headers['x-now-route-matches'];
+    if (matchedPath && typeof matchedPath === 'string' && matchedPath.startsWith('/')) {
+      const queryIndex = req.url.indexOf('?');
+      const queryString = queryIndex !== -1 ? req.url.substring(queryIndex) : '';
+      req.url = matchedPath + queryString;
+    }
+    next();
+  });
+
+  // ── Direct root /health endpoint for serverless cold-start verification ─
+  app.get('/health', (_req, res) => {
+    res.status(200).json({
+      status: 'ok',
+      service: 'kanakku-backend',
+      version: '1.0.0',
+      environment: config.server.nodeEnv,
+      timestamp: new Date().toISOString(),
+      serverless: !!(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME),
+    });
+  });
 
   // ── Global rate limiter ────────────────────────────────────────────────
   app.use(generalRateLimiter);

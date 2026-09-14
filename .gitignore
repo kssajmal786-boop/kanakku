@@ -23,7 +23,6 @@ yarn-error.log*
 # Build outputs
 dist/
 backend/dist/
-public/
 .vercel/
 
 # OS metadata

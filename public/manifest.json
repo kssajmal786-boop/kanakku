@@ -1,0 +1,41 @@
+{
+  "name": "CashFlow - Personal Finance",
+  "short_name": "CashFlow",
+  "description": "Your personal finance companion. Track UPI, cards, cash and more.",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#f5f6f8",
+  "theme_color": "#0e7c7b",
+  "lang": "en",
+  "icons": [
+    {
+      "src": "assets/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["finance", "productivity"],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "Dashboard",
+      "short_name": "Dashboard",
+      "url": "/#/dashboard",
+      "description": "View your financial dashboard"
+    },
+    {
+      "name": "Add Expense",
+      "short_name": "Add",
+      "url": "/#/transactions/add",
+      "description": "Add a new transaction"
+    }
+  ]
+}
