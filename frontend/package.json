@@ -1,0 +1,13 @@
+{
+  "name": "cashflow-frontend",
+  "version": "1.0.0",
+  "description": "CashFlow Personal Finance PWA — Modern, Local-First, AI-Powered",
+  "main": "server.js",
+  "scripts": {
+    "dev": "node server.js",
+    "start": "node server.js"
+  },
+  "keywords": ["finance", "pwa", "local-first", "chartjs"],
+  "author": "",
+  "license": "MIT"
+}

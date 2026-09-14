@@ -1,0 +1,20 @@
+{
+  "name": "cashflow-app-workspace",
+  "version": "1.0.0",
+  "private": true,
+  "description": "CashFlow Personal Finance App — Monorepo Workspace for Local & Vercel Deployment",
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
+  "scripts": {
+    "prepare-public": "node scripts/prepare-public.js",
+    "build": "node scripts/prepare-public.js && npm run build --workspace=backend",
+    "start": "npm run start --workspace=backend",
+    "dev:backend": "npm run dev --workspace=backend",
+    "dev:frontend": "npm run dev --workspace=frontend"
+  },
+  "devDependencies": {
+    "@vercel/node": "^3.2.0"
+  }
+}
