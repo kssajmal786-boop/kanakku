@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "buildCommand": "npm run build --workspace=backend",
+  "buildCommand": "npm run build",
   "outputDirectory": "frontend",
   "framework": null,
   "functions": {
