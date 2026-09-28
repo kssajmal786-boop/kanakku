@@ -5,27 +5,36 @@
 import rateLimit from 'express-rate-limit';
 import { config } from '../config';
 
-/** General API rate limiter */
-export const generalRateLimiter = rateLimit({
+const serverlessSafe = {
   windowMs: config.rateLimit.windowMs,
-  max: config.rateLimit.max,
   standardHeaders: true,
   legacyHeaders: false,
+  // Vercel sets X-Forwarded-For. Skip the v7 validation crash.
+  validate: {
+    xForwardedForHeader: false,
+    default: true,
+  },
+} as const;
+
+/** General API rate limiter */
+export const generalRateLimiter = rateLimit({
+  ...serverlessSafe,
+  max: config.rateLimit.max,
   message: {
     success: false,
     error: 'Too many requests, please try again later',
     code: 'RATE_LIMITED',
     timestamp: new Date().toISOString(),
   },
-  skip: (req) => config.server.isTest || req.path === '/health' || req.path === '/api/health',
+  skip: (req) =>
+    config.server.isTest || req.path === '/health' || req.path === '/api/health',
 });
 
 /** Gmail sync rate limiter — stricter to prevent Gmail API abuse */
 export const gmailSyncRateLimiter = rateLimit({
+  ...serverlessSafe,
   windowMs: config.rateLimit.gmailSyncWindowMs,
   max: config.rateLimit.gmailSyncMax,
-  standardHeaders: true,
-  legacyHeaders: false,
   keyGenerator: (req) => req.user?.userId ?? req.ip ?? 'unknown',
   message: {
     success: false,
@@ -38,10 +47,9 @@ export const gmailSyncRateLimiter = rateLimit({
 
 /** Auth endpoint rate limiter */
 export const authRateLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,  // 15 minutes
+  ...serverlessSafe,
+  windowMs: 15 * 60 * 1000,
   max: 20,
-  standardHeaders: true,
-  legacyHeaders: false,
   message: {
     success: false,
     error: 'Too many authentication attempts',

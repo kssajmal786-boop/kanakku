@@ -26,21 +26,17 @@ import gmailRouter from './routes/gmail.routes';
 import transactionsRouter from './routes/transactions.routes';
 import aiRouter from './routes/ai.routes';
 
+const isServerless = !!(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME);
+
 export function createApp(): Application {
   const app = express();
 
-  // ── URL Normalization for Vercel Serverless Rewrites ────────────────────
-  app.use((req, _res, next) => {
-    const matchedPath = req.headers['x-matched-path'] || req.headers['x-now-route-matches'];
-    if (matchedPath && typeof matchedPath === 'string' && matchedPath.startsWith('/')) {
-      const queryIndex = req.url.indexOf('?');
-      const queryString = queryIndex !== -1 ? req.url.substring(queryIndex) : '';
-      req.url = matchedPath + queryString;
-    }
-    next();
-  });
+  // Vercel / proxies set X-Forwarded-For. Required so express-rate-limit
+  // does not throw ERR_ERL_UNEXPECTED_X_FORWARDED_FOR on every request.
+  app.set('trust proxy', isServerless ? 1 : config.server.trustProxy);
+  app.disable('x-powered-by');
 
-  // ── Lightweight Health Check (Bypasses all heavier middleware) ───────────
+  // ── Lightweight Health Check (Bypasses heavier middleware) ───────────────
   const healthHandler = (_req: express.Request, res: express.Response) => {
     res.status(200).json({
       status: 'ok',
@@ -48,24 +44,16 @@ export function createApp(): Application {
       version: '1.0.0',
       environment: config.server.nodeEnv,
       timestamp: new Date().toISOString(),
-      serverless: !!(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME),
+      serverless: isServerless,
     });
   };
   app.get('/health', healthHandler);
   app.get('/api/health', healthHandler);
 
-  // ── Trust proxy ────────────────────────────────────────────────────────
-  if (config.server.trustProxy > 0) {
-    app.set('trust proxy', config.server.trustProxy);
-  }
-
-  // ── Disable Express x-powered-by header natively ───────────────────────
-  app.disable('x-powered-by');
-
-  // ── Security headers (hidePoweredBy: false prevents removeHeader crash in serverless) ─
+  // ── Security headers (hidePoweredBy: false prevents removeHeader crash) ─
   app.use(
     helmet({
-      contentSecurityPolicy: false, // Frontend sets its own CSP
+      contentSecurityPolicy: false,
       crossOriginEmbedderPolicy: false,
       hidePoweredBy: false,
     })
@@ -81,11 +69,9 @@ export function createApp(): Application {
         if (config.server.allowedOrigins.includes(origin)) {
           return callback(null, true);
         }
-        // Support Vercel deployment and preview URLs
         if (/^https:\/\/[a-zA-Z0-9-_.]+\.vercel\.app$/.test(origin)) {
           return callback(null, true);
         }
-        // Permissive fallback without throwing 500 error
         return callback(null, true);
       },
       credentials: true,
@@ -96,38 +82,30 @@ export function createApp(): Application {
     })
   );
 
-  // ── Compression ────────────────────────────────────────────────────────
   app.use(compression());
-
-  // ── Body parsers ───────────────────────────────────────────────────────
   app.use(express.json({ limit: '2mb' }));
   app.use(express.urlencoded({ extended: true, limit: '2mb' }));
-
-  // ── Cookie parser ──────────────────────────────────────────────────────
   app.use(cookieParser(config.cookie.secret));
 
-  // ── Request ID ─────────────────────────────────────────────────────────
   app.use((req, _res, next) => {
     req.requestId = (req.headers['x-request-id'] as string) ?? crypto.randomUUID();
     next();
   });
 
-  // ── HTTP request logging (no body content logged) ──────────────────────
   if (!config.server.isTest) {
     app.use(
       morgan('combined', {
         stream: {
           write: (msg: string) => logger.http(msg.trim()),
         },
-        skip: (req) => req.path === '/health',
+        skip: (req) => req.path === '/health' || req.path === '/api/health',
       })
     );
   }
 
-  // ── Global rate limiter ────────────────────────────────────────────────
   app.use(generalRateLimiter);
 
-  // ── API Routes (Dual-mounted at / and /api for serverless compatibility) ─
+  // Dual-mounted at / and /api for Vercel rewrites
   const apiRouter = express.Router();
   apiRouter.use('/health', healthRouter);
   apiRouter.use('/auth', authRouter);
@@ -138,18 +116,24 @@ export function createApp(): Application {
   app.use(apiRouter);
   app.use('/api', apiRouter);
 
-  // ── Serve frontend static files ────────────────────────────────────────
-  // In production (Render, Docker, or Vercel), backend serves static PWA as fallback
+  // Static PWA fallback (Vercel also serves /public as CDN assets)
   const publicPath = path.resolve(process.cwd(), 'public');
   const frontendPath = path.resolve(__dirname, '../../frontend');
-  const staticPath = fs.existsSync(publicPath) ? publicPath : (fs.existsSync(frontendPath) ? frontendPath : null);
+  const staticPath = fs.existsSync(publicPath)
+    ? publicPath
+    : fs.existsSync(frontendPath)
+      ? frontendPath
+      : null;
 
   if (staticPath) {
     app.use(express.static(staticPath));
-    // SPA fallback
     app.get('*', (_req, res, next) => {
-      // If request looks like an API call that was unhandled, pass to 404 handler
-      if (_req.path.startsWith('/api') || _req.path.startsWith('/auth') || _req.path.startsWith('/gmail') || _req.path.startsWith('/ai')) {
+      if (
+        _req.path.startsWith('/api') ||
+        _req.path.startsWith('/auth') ||
+        _req.path.startsWith('/gmail') ||
+        _req.path.startsWith('/ai')
+      ) {
         return next();
       }
       const indexPath = path.join(staticPath, 'index.html');
@@ -161,10 +145,7 @@ export function createApp(): Application {
     });
   }
 
-  // ── 404 handler ────────────────────────────────────────────────────────
   app.use(notFoundHandler);
-
-  // ── Global error handler ───────────────────────────────────────────────
   app.use(errorHandler);
 
   return app;

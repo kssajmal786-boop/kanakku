@@ -1,15 +1,11 @@
 /**
- * Vercel Serverless Function Entry Point for CashFlow
- * ─────────────────────────────────────────────────────────────────────────
- * Direct static require with Express error fallback ensuring module.exports
- * is ALWAYS a valid Express instance with .handle, preventing 500 crashes.
- * ─────────────────────────────────────────────────────────────────────────
+ * Vercel Serverless Function Entry Point for Kanakku / CashFlow
+ * Only API traffic is routed here. The PWA is served as static files.
  */
 
 let app;
 
 try {
-  // Static string literal required for @vercel/nft static analysis
   const { createApp } = require('../backend/dist/app');
   app = createApp();
 } catch (err) {
@@ -20,9 +16,8 @@ try {
     res.status(500).json({
       success: false,
       error: 'Backend failed to initialize on startup',
-      message: err.message,
-      stack: err.stack,
-      code: err.code,
+      message: err && err.message ? err.message : String(err),
+      code: err && err.code ? err.code : 'COLD_START',
     });
   });
 }

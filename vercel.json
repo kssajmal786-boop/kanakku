@@ -1,13 +1,10 @@
 {
   "version": 2,
   "buildCommand": "npm run build",
+  "outputDirectory": "public",
+  "framework": null,
   "functions": {
-    "api/*.js": {
-      "includeFiles": "backend/dist/**",
-      "maxDuration": 60,
-      "memory": 1024
-    },
-    "index.js": {
+    "api/index.js": {
       "includeFiles": "backend/dist/**",
       "maxDuration": 60,
       "memory": 1024
@@ -45,10 +42,6 @@
     {
       "source": "/api/:path*",
       "destination": "/api/index"
-    },
-    {
-      "source": "/((?!api|.*\\..*).*)",
-      "destination": "/index.html"
     }
   ],
   "headers": [
