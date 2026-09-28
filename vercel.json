@@ -1,7 +1,7 @@
 {
   "version": 2,
-  "buildCommand": "npm run build",
-  "outputDirectory": "www",
+  "buildCommand": "npm run build --workspace=backend",
+  "outputDirectory": "frontend",
   "framework": null,
   "functions": {
     "api/index.js": {
