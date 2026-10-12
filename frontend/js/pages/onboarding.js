@@ -119,6 +119,21 @@ function renderGoogleLogin(container, opts = {}) {
             Note: Gmail auto-sync requires Google sign-in. Email accounts can still track cash, cards, and receipts manually.
           </p>
         </div>
+
+        <!-- Public Legal Links for Google OAuth Compliance -->
+        <div style="margin-top:var(--space-3);padding-top:var(--space-3);border-top:1px solid var(--color-border);display:flex;flex-direction:column;gap:var(--space-2);text-align:center;">
+          <p style="font-size:11px;color:var(--color-text-muted);line-height:1.4;margin:0;">
+            By continuing, you agree to Kanakku's
+            <a href="/terms" target="_blank" rel="noopener noreferrer" style="color:var(--color-brand-primary);text-decoration:none;font-weight:var(--weight-semibold);">Terms of Service</a>
+            and
+            <a href="/privacy" target="_blank" rel="noopener noreferrer" style="color:var(--color-brand-primary);text-decoration:none;font-weight:var(--weight-semibold);">Privacy Policy</a>.
+          </p>
+          <div style="display:flex;justify-content:center;align-items:center;gap:var(--space-3);font-size:11px;">
+            <a href="/privacy" target="_blank" rel="noopener noreferrer" style="color:var(--color-text-secondary);text-decoration:none;">Privacy Policy</a>
+            <span style="color:var(--color-border);font-size:10px;">•</span>
+            <a href="/terms" target="_blank" rel="noopener noreferrer" style="color:var(--color-text-secondary);text-decoration:none;">Terms of Service</a>
+          </div>
+        </div>
       </div>
 
     </div>

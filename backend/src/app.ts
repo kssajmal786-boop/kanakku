@@ -126,7 +126,29 @@ export function createApp(): Application {
       : null;
 
   if (staticPath) {
+    app.get(['/privacy', '/privacy/'], (_req, res) => {
+      const privacyPath = path.join(staticPath, 'privacy', 'index.html');
+      if (fs.existsSync(privacyPath)) {
+        return res.sendFile(privacyPath);
+      }
+      const altPath = path.join(staticPath, 'privacy.html');
+      if (fs.existsSync(altPath)) return res.sendFile(altPath);
+      res.redirect('/');
+    });
+
+    app.get(['/terms', '/terms/'], (_req, res) => {
+      const termsPath = path.join(staticPath, 'terms', 'index.html');
+      if (fs.existsSync(termsPath)) {
+        return res.sendFile(termsPath);
+      }
+      const altPath = path.join(staticPath, 'terms.html');
+      if (fs.existsSync(altPath)) return res.sendFile(altPath);
+      res.redirect('/');
+    });
+
     app.use(express.static(staticPath));
+
+    // SPA fallback
     app.get('*', (_req, res, next) => {
       if (
         _req.path.startsWith('/api') ||

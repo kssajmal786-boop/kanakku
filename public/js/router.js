@@ -21,6 +21,14 @@ let _handlers = {};
  * Navigate to a route
  */
 export function navigate(route) {
+  if (route === '/privacy' || route === '#/privacy') {
+    window.location.href = '/privacy';
+    return;
+  }
+  if (route === '/terms' || route === '#/terms') {
+    window.location.href = '/terms';
+    return;
+  }
   window.location.hash = route;
 }
 
@@ -36,6 +44,10 @@ export function initRouter() {
   const handle = () => {
     const rawHash   = window.location.hash.slice(1) || '/dashboard';
     const hash      = rawHash.split('?')[0] || '/dashboard';
+
+    if (hash === '/privacy') { window.location.href = '/privacy'; return; }
+    if (hash === '/terms') { window.location.href = '/terms'; return; }
+
     const page      = ROUTES[hash] || 'dashboard';
     const handler   = _handlers[hash];
 

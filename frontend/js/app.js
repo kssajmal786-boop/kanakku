@@ -22,6 +22,18 @@ import { initCurrency, resetCurrencyOnLogout, getCurrencySymbol } from './servic
 // ── Initialization ───────────────────────────────────────────
 
 async function init() {
+  // 0. Public route guard for /privacy and /terms
+  const curPath = (window.location.pathname || '').toLowerCase();
+  const curHash = (window.location.hash || '').toLowerCase();
+  if (curPath === '/privacy' || curPath === '/privacy/' || curHash === '#/privacy') {
+    window.location.replace('/privacy');
+    return;
+  }
+  if (curPath === '/terms' || curPath === '/terms/' || curHash === '#/terms') {
+    window.location.replace('/terms');
+    return;
+  }
+
   // 1. i18n, Theme, Currency
   initI18n();
   const initialUser = loadSession();

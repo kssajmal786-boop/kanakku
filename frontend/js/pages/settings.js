@@ -431,10 +431,34 @@ function renderAccountCategory() {
           ${chevronRight()}
         </div>
 
+        <!-- Privacy Policy -->
+        <a href="/privacy" target="_blank" rel="noopener noreferrer" class="settings-item" style="cursor:pointer;text-decoration:none;color:inherit;">
+          <div class="settings-item-left">
+            <div class="settings-icon" style="background:rgba(14,124,123,0.1);color:var(--color-flow);">🛡️</div>
+            <div>
+              <div class="settings-label">Privacy Policy</div>
+              <div class="settings-desc">Google OAuth disclosures, data handling & deletion policy</div>
+            </div>
+          </div>
+          ${chevronRight()}
+        </a>
+
+        <!-- Terms of Service -->
+        <a href="/terms" target="_blank" rel="noopener noreferrer" class="settings-item" style="cursor:pointer;text-decoration:none;color:inherit;">
+          <div class="settings-item-left">
+            <div class="settings-icon" style="background:rgba(67,56,202,0.1);color:var(--color-intel);">📜</div>
+            <div>
+              <div class="settings-label">Terms of Service</div>
+              <div class="settings-desc">User responsibilities, service scope & financial disclaimers</div>
+            </div>
+          </div>
+          ${chevronRight()}
+        </a>
+
         <!-- About -->
         <div class="settings-item" style="cursor:default;">
           <div class="settings-item-left">
-            <div class="settings-icon" style="background:rgba(67,56,202,0.1);color:var(--color-intel);">ℹ️</div>
+            <div class="settings-icon" style="background:rgba(102,112,133,0.1);color:var(--color-text-muted);">ℹ️</div>
             <div>
               <div class="settings-label" data-i18n="settings.version">Version</div>
               <div class="settings-desc">Kanakku Finance PWA v1.0.0 (Command Console)</div>

@@ -28,19 +28,14 @@ const auth_routes_1 = __importDefault(require("./routes/auth.routes"));
 const gmail_routes_1 = __importDefault(require("./routes/gmail.routes"));
 const transactions_routes_1 = __importDefault(require("./routes/transactions.routes"));
 const ai_routes_1 = __importDefault(require("./routes/ai.routes"));
+const isServerless = !!(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME);
 function createApp() {
     const app = (0, express_1.default)();
-    // ── URL Normalization for Vercel Serverless Rewrites ────────────────────
-    app.use((req, _res, next) => {
-        const matchedPath = req.headers['x-matched-path'] || req.headers['x-now-route-matches'];
-        if (matchedPath && typeof matchedPath === 'string' && matchedPath.startsWith('/')) {
-            const queryIndex = req.url.indexOf('?');
-            const queryString = queryIndex !== -1 ? req.url.substring(queryIndex) : '';
-            req.url = matchedPath + queryString;
-        }
-        next();
-    });
-    // ── Lightweight Health Check (Bypasses all heavier middleware) ───────────
+    // Vercel / proxies set X-Forwarded-For. Required so express-rate-limit
+    // does not throw ERR_ERL_UNEXPECTED_X_FORWARDED_FOR on every request.
+    app.set('trust proxy', isServerless ? 1 : config_1.config.server.trustProxy);
+    app.disable('x-powered-by');
+    // ── Lightweight Health Check (Bypasses heavier middleware) ───────────────
     const healthHandler = (_req, res) => {
         res.status(200).json({
             status: 'ok',
@@ -48,20 +43,14 @@ function createApp() {
             version: '1.0.0',
             environment: config_1.config.server.nodeEnv,
             timestamp: new Date().toISOString(),
-            serverless: !!(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME),
+            serverless: isServerless,
         });
     };
     app.get('/health', healthHandler);
     app.get('/api/health', healthHandler);
-    // ── Trust proxy ────────────────────────────────────────────────────────
-    if (config_1.config.server.trustProxy > 0) {
-        app.set('trust proxy', config_1.config.server.trustProxy);
-    }
-    // ── Disable Express x-powered-by header natively ───────────────────────
-    app.disable('x-powered-by');
-    // ── Security headers (hidePoweredBy: false prevents removeHeader crash in serverless) ─
+    // ── Security headers (hidePoweredBy: false prevents removeHeader crash) ─
     app.use((0, helmet_1.default)({
-        contentSecurityPolicy: false, // Frontend sets its own CSP
+        contentSecurityPolicy: false,
         crossOriginEmbedderPolicy: false,
         hidePoweredBy: false,
     }));
@@ -74,11 +63,9 @@ function createApp() {
             if (config_1.config.server.allowedOrigins.includes(origin)) {
                 return callback(null, true);
             }
-            // Support Vercel deployment and preview URLs
             if (/^https:\/\/[a-zA-Z0-9-_.]+\.vercel\.app$/.test(origin)) {
                 return callback(null, true);
             }
-            // Permissive fallback without throwing 500 error
             return callback(null, true);
         },
         credentials: true,
@@ -87,30 +74,24 @@ function createApp() {
         exposedHeaders: ['X-Request-ID'],
         maxAge: 86400,
     }));
-    // ── Compression ────────────────────────────────────────────────────────
     app.use((0, compression_1.default)());
-    // ── Body parsers ───────────────────────────────────────────────────────
     app.use(express_1.default.json({ limit: '2mb' }));
     app.use(express_1.default.urlencoded({ extended: true, limit: '2mb' }));
-    // ── Cookie parser ──────────────────────────────────────────────────────
     app.use((0, cookie_parser_1.default)(config_1.config.cookie.secret));
-    // ── Request ID ─────────────────────────────────────────────────────────
     app.use((req, _res, next) => {
         req.requestId = req.headers['x-request-id'] ?? crypto_1.default.randomUUID();
         next();
     });
-    // ── HTTP request logging (no body content logged) ──────────────────────
     if (!config_1.config.server.isTest) {
         app.use((0, morgan_1.default)('combined', {
             stream: {
                 write: (msg) => logger_1.logger.http(msg.trim()),
             },
-            skip: (req) => req.path === '/health',
+            skip: (req) => req.path === '/health' || req.path === '/api/health',
         }));
     }
-    // ── Global rate limiter ────────────────────────────────────────────────
     app.use(rateLimit_middleware_1.generalRateLimiter);
-    // ── API Routes (Dual-mounted at / and /api for serverless compatibility) ─
+    // Dual-mounted at / and /api for Vercel rewrites
     const apiRouter = express_1.default.Router();
     apiRouter.use('/health', health_routes_1.default);
     apiRouter.use('/auth', auth_routes_1.default);
@@ -119,17 +100,42 @@ function createApp() {
     apiRouter.use('/ai', ai_routes_1.default);
     app.use(apiRouter);
     app.use('/api', apiRouter);
-    // ── Serve frontend static files ────────────────────────────────────────
-    // In production (Render, Docker, or Vercel), backend serves static PWA as fallback
+    // Static PWA fallback (Vercel also serves /public as CDN assets)
     const publicPath = path_1.default.resolve(process.cwd(), 'public');
     const frontendPath = path_1.default.resolve(__dirname, '../../frontend');
-    const staticPath = fs_1.default.existsSync(publicPath) ? publicPath : (fs_1.default.existsSync(frontendPath) ? frontendPath : null);
+    const staticPath = fs_1.default.existsSync(publicPath)
+        ? publicPath
+        : fs_1.default.existsSync(frontendPath)
+            ? frontendPath
+            : null;
     if (staticPath) {
+        app.get(['/privacy', '/privacy/'], (_req, res) => {
+            const privacyPath = path_1.default.join(staticPath, 'privacy', 'index.html');
+            if (fs_1.default.existsSync(privacyPath)) {
+                return res.sendFile(privacyPath);
+            }
+            const altPath = path_1.default.join(staticPath, 'privacy.html');
+            if (fs_1.default.existsSync(altPath))
+                return res.sendFile(altPath);
+            res.redirect('/');
+        });
+        app.get(['/terms', '/terms/'], (_req, res) => {
+            const termsPath = path_1.default.join(staticPath, 'terms', 'index.html');
+            if (fs_1.default.existsSync(termsPath)) {
+                return res.sendFile(termsPath);
+            }
+            const altPath = path_1.default.join(staticPath, 'terms.html');
+            if (fs_1.default.existsSync(altPath))
+                return res.sendFile(altPath);
+            res.redirect('/');
+        });
         app.use(express_1.default.static(staticPath));
         // SPA fallback
         app.get('*', (_req, res, next) => {
-            // If request looks like an API call that was unhandled, pass to 404 handler
-            if (_req.path.startsWith('/api') || _req.path.startsWith('/auth') || _req.path.startsWith('/gmail') || _req.path.startsWith('/ai')) {
+            if (_req.path.startsWith('/api') ||
+                _req.path.startsWith('/auth') ||
+                _req.path.startsWith('/gmail') ||
+                _req.path.startsWith('/ai')) {
                 return next();
             }
             const indexPath = path_1.default.join(staticPath, 'index.html');
@@ -141,9 +147,7 @@ function createApp() {
             }
         });
     }
-    // ── 404 handler ────────────────────────────────────────────────────────
     app.use(error_middleware_1.notFoundHandler);
-    // ── Global error handler ───────────────────────────────────────────────
     app.use(error_middleware_1.errorHandler);
     return app;
 }

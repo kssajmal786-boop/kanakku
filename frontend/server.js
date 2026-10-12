@@ -29,8 +29,9 @@ const server = http.createServer((req, res) => {
   let pathname = decodeURIComponent(parsedUrl.pathname);
 
   // Security check: prevent path traversal
-  const safePath = path.normalize(path.join(ROOT, pathname));
-  if (!safePath.startsWith(ROOT)) {
+  const normalizedRoot = path.normalize(ROOT);
+  const safePath = path.normalize(path.join(normalizedRoot, pathname));
+  if (!safePath.toLowerCase().startsWith(normalizedRoot.toLowerCase())) {
     res.writeHead(403, { 'Content-Type': 'text/plain' });
     res.end('Forbidden');
     return;
