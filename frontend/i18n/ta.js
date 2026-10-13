@@ -2,7 +2,7 @@
 export default {
   // ===== App =====
   app: {
-    name: 'CashFlow',
+    name: 'Kanakku',
     tagline: 'உங்கள் தனிப்பட்ட நிதி நண்பர்',
     loading: 'ஏற்றுகிறது...',
     error: 'ஏதோ தவறு நடந்தது',
@@ -42,7 +42,7 @@ export default {
 
   // ===== Onboarding =====
   onboarding: {
-    welcomeTitle:   'CashFlow-க்கு வரவேற்கிறோம்',
+    welcomeTitle:   'Kanakku-க்கு வரவேற்கிறோம்',
     welcomeSubtitle:'நவீன இந்தியாவிற்கான நிதி கண்காணிப்பு',
     getStarted:     'தொடங்குங்கள்',
     googleLogin:    'Google மூலம் தொடரவும்',
@@ -127,7 +127,7 @@ export default {
       'இந்த வாரம் நான் அதிகமாக செலவு செய்தேனா?',
     ],
     thinking:       'யோசிக்கிறேன்...',
-    assistantName:  'CashFlow AI',
+    assistantName:  'Kanakku AI',
     emptyTitle:     'எதையும் கேளுங்கள்',
     emptyDesc:      'உங்கள் செலவை புரிந்துகொள்ள, அறிக்கைகள் உருவாக்க மற்றும் நிதி நுண்ணறிவை வழங்க என்னால் உதவ முடியும்.',
     errorMsg:       'மன்னிக்கவும், அதை செயலாக்க முடியவில்லை. மீண்டும் முயற்சிக்கவும்.',

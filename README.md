@@ -1,4 +1,4 @@
-# CashFlow — Personal Finance App
+# Kanakku — Personal Finance App
 
 ## Quick Start
 

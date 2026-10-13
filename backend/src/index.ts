@@ -28,7 +28,7 @@ db.init().catch(err => {
 });
 
 const server = app.listen(config.server.port, '0.0.0.0', () => {
-  logger.info(`Cashflow backend running`, {
+  logger.info(`Kanakku backend running`, {
     port: config.server.port,
     env: config.server.nodeEnv,
     pid: process.pid,

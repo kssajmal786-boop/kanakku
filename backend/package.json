@@ -1,7 +1,7 @@
 {
-  "name": "cashflow-backend",
+  "name": "kanakku-backend",
   "version": "1.0.0",
-  "description": "CashFlow Personal Finance App — Backend API (stateless, privacy-first)",
+  "description": "Kanakku Personal Finance App — Backend API (stateless, privacy-first)",
   "main": "dist/index.js",
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts",

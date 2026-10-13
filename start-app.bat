@@ -1,5 +1,5 @@
 @echo off
-title CashFlow App Launcher
+title Kanakku App Launcher
 color 0A
 
 echo.
@@ -26,14 +26,14 @@ if not exist "%~dp0backend\.env" (
 
 :: Start backend in a new window
 echo  [1/2] Starting backend API (port 3001)...
-start "CashFlow Backend" cmd /k "cd /d "%~dp0backend" && npm run dev"
+start "Kanakku Backend" cmd /k "cd /d "%~dp0backend" && npm run dev"
 
 :: Wait a moment for backend to initialize
 timeout /t 2 /nobreak >nul
 
 :: Start frontend in a new window
 echo  [2/2] Starting frontend PWA (port 3000)...
-start "CashFlow Frontend" cmd /k "cd /d "%~dp0frontend" && node server.js"
+start "Kanakku Frontend" cmd /k "cd /d "%~dp0frontend" && node server.js"
 
 :: Wait for frontend to start
 timeout /t 2 /nobreak >nul

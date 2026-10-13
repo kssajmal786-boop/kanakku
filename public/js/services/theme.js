@@ -1,5 +1,5 @@
 // ============================================================
-// CashFlow Theme Service
+// Kanakku Theme Service
 // Centralized theme management for Light, Dark, and System modes
 // Supports immediate application, user-scoped persistence, and
 // automatic OS color scheme tracking.
@@ -12,6 +12,9 @@ let _mediaQueryListener = null;
  * Storage key for theme preference: scoped per user when authenticated
  */
 function getStorageKey(userId) {
+  return userId ? `kanakku_theme_${userId}` : 'kanakku_theme';
+}
+function getLegacyStorageKey(userId) {
   return userId ? `cashflow_theme_${userId}` : 'cashflow_theme';
 }
 
@@ -23,7 +26,8 @@ function getStorageKey(userId) {
 export function getSavedTheme(userId = null) {
   try {
     const key = getStorageKey(userId);
-    const saved = localStorage.getItem(key);
+    const legacyKey = getLegacyStorageKey(userId);
+    const saved = localStorage.getItem(key) || localStorage.getItem(legacyKey);
     if (saved === 'light' || saved === 'dark' || saved === 'system') {
       return saved;
     }
@@ -61,8 +65,8 @@ export function applyTheme(theme = 'light', userId = null, save = true) {
   // 1. Persist if requested
   if (save) {
     try {
-      const key = getStorageKey(userId);
-      localStorage.setItem(key, validTheme);
+      localStorage.setItem(getStorageKey(userId), validTheme);
+      localStorage.setItem(getLegacyStorageKey(userId), validTheme);
     } catch (_) {}
   }
 
@@ -114,6 +118,7 @@ export function applyTheme(theme = 'light', userId = null, save = true) {
           window.Chart.defaults.color = newEffective === 'dark' ? '#9ca3af' : '#667085';
           window.Chart.defaults.borderColor = newEffective === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(16, 21, 31, 0.06)';
         }
+        window.dispatchEvent(new CustomEvent('kanakku:themechange', { detail: { theme: 'system', effectiveTheme: newEffective } }));
         window.dispatchEvent(new CustomEvent('cashflow:themechange', { detail: { theme: 'system', effectiveTheme: newEffective } }));
       };
 
@@ -127,6 +132,7 @@ export function applyTheme(theme = 'light', userId = null, save = true) {
 
   // 6. Dispatch custom event for any listening views
   if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent('kanakku:themechange', { detail: { theme: validTheme, effectiveTheme } }));
     window.dispatchEvent(new CustomEvent('cashflow:themechange', { detail: { theme: validTheme, effectiveTheme } }));
   }
 

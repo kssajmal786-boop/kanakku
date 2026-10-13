@@ -36,6 +36,15 @@ export function createApp(): Application {
   app.set('trust proxy', isServerless ? 1 : config.server.trustProxy);
   app.disable('x-powered-by');
 
+  // ── Security headers (hidePoweredBy: false prevents removeHeader crash) ─
+  app.use(
+    helmet({
+      contentSecurityPolicy: false,
+      crossOriginEmbedderPolicy: false,
+      hidePoweredBy: false,
+    })
+  );
+
   // ── Lightweight Health Check (Bypasses heavier middleware) ───────────────
   const healthHandler = (_req: express.Request, res: express.Response) => {
     res.status(200).json({
@@ -49,15 +58,6 @@ export function createApp(): Application {
   };
   app.get('/health', healthHandler);
   app.get('/api/health', healthHandler);
-
-  // ── Security headers (hidePoweredBy: false prevents removeHeader crash) ─
-  app.use(
-    helmet({
-      contentSecurityPolicy: false,
-      crossOriginEmbedderPolicy: false,
-      hidePoweredBy: false,
-    })
-  );
 
   // ── CORS ───────────────────────────────────────────────────────────────
   app.use(
@@ -125,7 +125,7 @@ export function createApp(): Application {
       ? frontendPath
       : null;
 
-  if (staticPath) {
+  if (!config.server.isTest && staticPath) {
     app.get(['/privacy', '/privacy/'], (_req, res) => {
       const privacyPath = path.join(staticPath, 'privacy', 'index.html');
       if (fs.existsSync(privacyPath)) {
@@ -162,7 +162,7 @@ export function createApp(): Application {
       if (fs.existsSync(indexPath)) {
         res.sendFile(indexPath);
       } else {
-        res.status(200).send('CashFlow API is live');
+        res.status(200).send('Kanakku API is live');
       }
     });
   }

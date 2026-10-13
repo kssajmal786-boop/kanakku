@@ -1,5 +1,5 @@
 // ============================================================
-// CashFlow App — Main Entry
+// Kanakku App — Main Entry
 // ============================================================
 
 import { initI18n, t, getLang, rerender } from './i18n.js';
@@ -260,7 +260,7 @@ function buildDesktopSidebar() {
   el.innerHTML = `
     <div class="desktop-nav-brand">
       <div class="desktop-nav-brand-mark">${getCurrencySymbol()}</div>
-      <div class="desktop-nav-brand-name">CashFlow</div>
+      <div class="desktop-nav-brand-name">Kanakku</div>
     </div>
     ${NAV_ITEMS.map(item => `
       <button class="desktop-nav-item" data-page="${item.id}">

@@ -1,4 +1,4 @@
-# Firebase App Hosting configuration for CashFlow
+# Firebase App Hosting configuration for Kanakku
 runConfig:
   minInstances: 0
   maxInstances: 10

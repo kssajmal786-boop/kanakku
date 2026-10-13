@@ -1,6 +1,6 @@
-# Complete Guide: Deploying CashFlow on Vercel
+# Complete Guide: Deploying Kanakku on Vercel
 
-This guide walks you step-by-step through deploying your CashFlow application to [Vercel](https://vercel.com).
+This guide walks you step-by-step through deploying your Kanakku application to [Vercel](https://vercel.com).
 
 ---
 
@@ -51,9 +51,9 @@ This guide walks you step-by-step through deploying your CashFlow application to
 Vercel functions cannot save files to disk permanently, so a cloud PostgreSQL database is needed for account storage.
 
 1. Go to [Neon.tech](https://neon.tech) and sign up for a free account.
-2. Click **Create Project**, name it `cashflow-db`, and choose your nearest region.
+2. Click **Create Project**, name it `kanakku-db`, and choose your nearest region.
 3. Once created, copy the **Connection string** (it looks like `postgresql://user:pass@ep-xyz.region.neon.tech/neondb?sslmode=require`).
-4. Save this URL—you will paste it as `DATABASE_URL` in Vercel. CashFlow automatically creates all required tables on first start!
+4. Save this URL—you will paste it as `DATABASE_URL` in Vercel. Kanakku automatically creates all required tables on first start!
 
 ---
 
@@ -151,7 +151,7 @@ If you prefer to keep the backend running 24/7 with zero serverless timeouts and
      <script>window.CASHFLOW_API_BASE = 'https://cashflow-backend.onrender.com';</script>
      ```
    - Deploy `frontend/` to Vercel as a static site.
-   - CashFlow's dynamic API client will automatically direct all requests to your Render backend!
+   - Kanakku's dynamic API client will automatically direct all requests to your Render backend!
 
 ---
 

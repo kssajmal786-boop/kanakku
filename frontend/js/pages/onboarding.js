@@ -50,7 +50,7 @@ function renderGoogleLogin(container, opts = {}) {
           💸
         </div>
         <div>
-          <h1 style="font-size:var(--text-3xl);font-weight:var(--weight-extrabold);" class="gradient-text">CashFlow</h1>
+          <h1 style="font-size:var(--text-3xl);font-weight:var(--weight-extrabold);" class="gradient-text">Kanakku</h1>
           <p style="color:var(--color-text-secondary);font-size:var(--text-sm);margin-top:var(--space-2);max-width:320px;">
             Automated personal finance & cash flow tracking with local-first privacy.
           </p>

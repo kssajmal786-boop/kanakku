@@ -1,6 +1,6 @@
 {
-  "name": "CashFlow - Personal Finance",
-  "short_name": "CashFlow",
+  "name": "Kanakku - Personal Finance",
+  "short_name": "Kanakku",
   "description": "Your personal finance companion. Track UPI, cards, cash and more.",
   "start_url": "/",
   "display": "standalone",

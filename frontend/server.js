@@ -77,5 +77,5 @@ const server = http.createServer((req, res) => {
 });
 
 server.listen(PORT, () => {
-  console.log(`[Frontend] CashFlow PWA running on http://localhost:${PORT}`);
+  console.log(`[Frontend] Kanakku PWA running on http://localhost:${PORT}`);
 });

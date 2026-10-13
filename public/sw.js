@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cashflow-v12';
+const CACHE_NAME = 'kanakku-v13';
 const STATIC_ASSETS = [
   '/',
   '/index.html',

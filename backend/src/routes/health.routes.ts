@@ -11,7 +11,7 @@ const router = Router();
 router.get('/', (_req: Request, res: Response): void => {
   res.status(200).json({
     status: 'ok',
-    service: 'cashflow-backend',
+    service: 'kanakku-backend',
     version: '1.0.0',
     environment: config.server.nodeEnv,
     timestamp: new Date().toISOString(),

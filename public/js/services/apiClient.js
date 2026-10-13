@@ -9,6 +9,9 @@
 // ============================================================
 
 const API_BASE = (function() {
+  if (typeof window.KANAKKU_API_BASE === 'string') {
+    return window.KANAKKU_API_BASE;
+  }
   if (typeof window.CASHFLOW_API_BASE === 'string') {
     return window.CASHFLOW_API_BASE;
   }

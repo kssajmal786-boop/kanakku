@@ -1,5 +1,5 @@
 /**
- * Vercel Serverless Function Entry Point for Kanakku / CashFlow
+ * Vercel Serverless Function Entry Point for Kanakku
  * Only API traffic is routed here. The PWA is served as static files.
  */
 

@@ -25,7 +25,7 @@ db_1.db.init().catch(err => {
     logger_1.logger.error('Failed to initialize database on startup', { error: err.message });
 });
 const server = app.listen(config_2.config.server.port, '0.0.0.0', () => {
-    logger_1.logger.info(`Cashflow backend running`, {
+    logger_1.logger.info(`Kanakku backend running`, {
         port: config_2.config.server.port,
         env: config_2.config.server.nodeEnv,
         pid: process.pid,

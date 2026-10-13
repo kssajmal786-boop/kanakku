@@ -1,5 +1,5 @@
 // ============================================================
-// CashFlow i18n Engine
+// Kanakku i18n Engine
 // Lightweight internationalization system
 // ============================================================
 
@@ -7,9 +7,10 @@ import en from '../i18n/en.js';
 import ta from '../i18n/ta.js';
 
 const TRANSLATIONS = { en, ta };
-const STORAGE_KEY  = 'cashflow_lang';
+const STORAGE_KEY  = 'kanakku_lang';
+const LEGACY_STORAGE_KEY = 'cashflow_lang';
 
-let _lang = localStorage.getItem(STORAGE_KEY) || 'en';
+let _lang = localStorage.getItem(STORAGE_KEY) || localStorage.getItem(LEGACY_STORAGE_KEY) || 'en';
 let _listeners = [];
 
 // ── Core API ──────────────────────────────────────────────
@@ -27,6 +28,7 @@ export function setLang(lang) {
   if (!TRANSLATIONS[lang]) { console.warn(`[i18n] Unknown lang: ${lang}`); return; }
   _lang = lang;
   localStorage.setItem(STORAGE_KEY, lang);
+  localStorage.setItem(LEGACY_STORAGE_KEY, lang);
   document.documentElement.lang = lang;
   document.body.className = document.body.className.replace(/\blang-\w+\b/, '');
   document.body.classList.add(`lang-${lang}`);

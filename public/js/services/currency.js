@@ -1,5 +1,5 @@
 // ============================================================
-// CashFlow Currency Service
+// Kanakku Currency Service
 // Centralized currency configuration, user-scoped persistence,
 // and standardized financial number formatting.
 // ============================================================
@@ -24,6 +24,9 @@ let _activeCurrencyCode = DEFAULT_CURRENCY;
  * Storage key for currency preference: scoped per user when authenticated
  */
 function getStorageKey(userId) {
+  return userId ? `kanakku_currency_${userId}` : 'kanakku_currency';
+}
+function getLegacyStorageKey(userId) {
   return userId ? `cashflow_currency_${userId}` : 'cashflow_currency';
 }
 
@@ -46,7 +49,8 @@ export function getCurrencyConfig(code) {
 export function getSavedCurrency(userId = null) {
   try {
     const key = getStorageKey(userId);
-    const saved = localStorage.getItem(key);
+    const legacyKey = getLegacyStorageKey(userId);
+    const saved = localStorage.getItem(key) || localStorage.getItem(legacyKey);
     if (saved && CURRENCIES.some(c => c.code === saved.toUpperCase())) {
       return saved.toUpperCase();
     }
@@ -88,12 +92,15 @@ export function setCurrency(code, userId = null, save = true) {
 
   if (save) {
     try {
-      const key = getStorageKey(userId);
-      localStorage.setItem(key, config.code);
+      localStorage.setItem(getStorageKey(userId), config.code);
+      localStorage.setItem(getLegacyStorageKey(userId), config.code);
     } catch (_) {}
   }
 
   if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent('kanakku:currencychange', {
+      detail: { currency: config }
+    }));
     window.dispatchEvent(new CustomEvent('cashflow:currencychange', {
       detail: { currency: config }
     }));

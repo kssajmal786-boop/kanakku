@@ -1,5 +1,5 @@
 // ============================================================
-// CashFlow State Store
+// Kanakku State Store
 // Simple reactive state management
 // ============================================================
 
@@ -85,16 +85,20 @@ export function resetState() {
 
 // Persist user session
 export function persistSession(user) {
-  try { localStorage.setItem('cashflow_user', JSON.stringify(user)); } catch {}
+  try {
+    localStorage.setItem('kanakku_user', JSON.stringify(user));
+    localStorage.setItem('cashflow_user', JSON.stringify(user));
+  } catch {}
 }
 
 export function loadSession() {
   try {
-    const raw = localStorage.getItem('cashflow_user');
+    const raw = localStorage.getItem('kanakku_user') || localStorage.getItem('cashflow_user');
     return raw ? JSON.parse(raw) : null;
   } catch { return null; }
 }
 
 export function clearSession() {
+  localStorage.removeItem('kanakku_user');
   localStorage.removeItem('cashflow_user');
 }

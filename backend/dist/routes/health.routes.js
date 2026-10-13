@@ -10,7 +10,7 @@ const router = (0, express_1.Router)();
 router.get('/', (_req, res) => {
     res.status(200).json({
         status: 'ok',
-        service: 'cashflow-backend',
+        service: 'kanakku-backend',
         version: '1.0.0',
         environment: config_1.config.server.nodeEnv,
         timestamp: new Date().toISOString(),

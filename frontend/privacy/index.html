@@ -19,9 +19,9 @@
   <script>
     (function() {
       try {
-        var user = JSON.parse(localStorage.getItem('cashflow_user') || 'null');
+        var user = JSON.parse(localStorage.getItem('kanakku_user') || localStorage.getItem('cashflow_user') || 'null');
         var userId = user && user.userId ? user.userId : null;
-        var saved = userId ? localStorage.getItem('cashflow_theme_' + userId) : localStorage.getItem('cashflow_theme');
+        var saved = userId ? (localStorage.getItem('kanakku_theme_' + userId) || localStorage.getItem('cashflow_theme_' + userId)) : (localStorage.getItem('kanakku_theme') || localStorage.getItem('cashflow_theme'));
         var theme = (saved === 'dark' || saved === 'system') ? saved : 'light';
         var effective = theme;
         if (theme === 'system') {
@@ -478,7 +478,7 @@
       </div>
       <h1 class="legal-title">Privacy Policy</h1>
       <div class="legal-meta">
-        <span><strong>Application:</strong> Kanakku (also CashFlow)</span>
+        <span><strong>Application:</strong> Kanakku</span>
         <span><strong>Live Deployment:</strong> <a href="https://kanakku-three.vercel.app" style="color:inherit;">kanakku-three.vercel.app</a></span>
         <span><strong>Effective Date:</strong> October 12, 2026</span>
         <span><strong>Last Updated:</strong> October 12, 2026</span>
@@ -543,7 +543,7 @@
     <section id="section-1" class="legal-section">
       <h2>1. About Kanakku & Core Features</h2>
       <p>
-        <strong>Kanakku</strong> (referenced in source repositories as CashFlow / Kanakku) is a personal finance management web application designed to help individuals monitor, categorize, and understand their day-to-day spending and cash flow.
+        <strong>Kanakku</strong> is a personal finance management web application designed to help individuals monitor, categorize, and understand their day-to-day spending and cash flow.
       </p>
       <p>Core features include:</p>
       <ul>
@@ -894,10 +894,12 @@
         document.documentElement.style.colorScheme = active;
 
         try {
-          var user = JSON.parse(localStorage.getItem('cashflow_user') || 'null');
+          var user = JSON.parse(localStorage.getItem('kanakku_user') || localStorage.getItem('cashflow_user') || 'null');
           if (user && user.userId) {
+            localStorage.setItem('kanakku_theme_' + user.userId, active);
             localStorage.setItem('cashflow_theme_' + user.userId, active);
           }
+          localStorage.setItem('kanakku_theme', active);
           localStorage.setItem('cashflow_theme', active);
         } catch (_) {}
 

@@ -35,3 +35,18 @@ fs.cpSync(FRONTEND_DIR, OUT_DIR, {
 });
 
 console.log('[Build] Successfully prepared static directory at', OUT_DIR);
+
+const PUBLIC_DIR = path.resolve(ROOT, 'public');
+if (fs.existsSync(PUBLIC_DIR)) {
+  fs.cpSync(FRONTEND_DIR, PUBLIC_DIR, {
+    recursive: true,
+    filter: (src) => {
+      const filename = path.basename(src);
+      if (filename === 'server.js' || filename === 'package.json') {
+        return false;
+      }
+      return true;
+    },
+  });
+  console.log('[Build] Successfully synchronized public directory at', PUBLIC_DIR);
+}
