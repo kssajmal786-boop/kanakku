@@ -45,7 +45,7 @@ start "" "http://localhost:3000"
 
 echo.
 echo  ─────────────────────────────────────────
-echo  CashFlow is running!
+echo  Kanakku is running!
 echo.
 echo  Frontend:  http://localhost:3000
 echo  Backend:   http://localhost:3001

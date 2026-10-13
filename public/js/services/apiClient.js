@@ -196,6 +196,15 @@ export async function initiateGoogleLogin() {
         message: errData.error || errData.message || `Server returned error (${res.status})`,
       };
     }
+    const contentType = res.headers.get('content-type') || '';
+    if (!contentType.includes('application/json')) {
+      return {
+        isConfigured: false,
+        authUrl: null,
+        offline: true,
+        message: 'Backend server returned non-JSON response. Please ensure the backend is running.',
+      };
+    }
     const data = await res.json();
     if (!data.success) {
       return {
@@ -212,7 +221,9 @@ export async function initiateGoogleLogin() {
       isConfigured: false,
       authUrl: null,
       offline: true,
-      message: `Backend server is unavailable${API_BASE ? ` at ${API_BASE}` : ''}. Please ensure the backend is running.`,
+      message: (err && err.message && !err.message.toLowerCase().includes('failed to fetch'))
+        ? err.message
+        : `Backend server is unavailable${API_BASE ? ` at ${API_BASE}` : ''}. Please ensure the backend is running.`,
     };
   }
 }
